@@ -1,0 +1,1 @@
+require 'swiss_tournament'
