@@ -8,9 +8,9 @@ ActiveRecord::Schema.define do
     t.column 'rating', :integer
   end
 
-  create_table "participations", :force => true, :id => false do |t|
-    t.references 'players'
-    t.references 'tournaments'
+  create_table "participations", :force => true do |t|
+    t.references 'player'
+    t.references 'tournament'
 
     t.column 'wins', :integer, :default => 0
     t.column 'losses', :integer, :default => 0
@@ -18,10 +18,10 @@ ActiveRecord::Schema.define do
   end
 
   create_table 'duels', :force => true do |t|
-    t.references 'tournaments'
+    t.references 'tournament'
     t.column 'player1_id', :integer
     t.column 'player2_id', :integer
-    t.column 'player1_wins', :integer
-    t.column 'player2_wins', :integer
+    t.column 'player1_wins', :integer, :default => nil
+    t.column 'player2_wins', :integer, :default => nil
   end
 end

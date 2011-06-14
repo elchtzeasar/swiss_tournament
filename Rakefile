@@ -1,11 +1,11 @@
 require 'cucumber/rake/task'
+require 'rspec/core/rake_task'
+
 
 namespace 'test' do
   desc 'Run unit tests'
-  task :unit do
-    `rspec spec/test_*.rb`
-  end
-
+  RSpec::Core::RakeTask.new(:unit)
+  
   namespace 'system' do
     Cucumber::Rake::Task.new(:verified, 'Run non-wip system tests') do |task|
       task.cucumber_opts = %w{--tags ~@wip features}
