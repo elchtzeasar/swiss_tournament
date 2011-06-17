@@ -1,4 +1,4 @@
-module SwissTournament
+module ActsAsPlayer
   def self.included(base)
     base.send :extend, ClassMethods
   end
@@ -7,8 +7,9 @@ module SwissTournament
     # any method placed here will apply to classes
     def acts_as_player(optons = {})
       send :include, InstanceMethods
-    end
 
+      validates_uniqueness_of :name
+    end
   end
  
   module InstanceMethods
@@ -16,4 +17,4 @@ module SwissTournament
   end
 end
 
-ActiveRecord::Base.send :include, SwissTournament
+ActiveRecord::Base.send :include, ActsAsPlayer

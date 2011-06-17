@@ -28,11 +28,11 @@ Scenario: Report results and see listings
       | Bugs Bunny  | Roger Rabbit    |             2 |             0 |
       | Speedrunner | Winnie the Pooh |             2 |             1 |
    Then the listings should be as follows:
-      | player          | place |
-      | Bugs Bunny      |     1 |
-      | Roger Rabbit    |     4 |
-      | Speedrunner     |     2 |
-      | Winnie the Pooh |     3 |
+      | player          |
+      | Bugs Bunny      |
+      | Speedrunner     |
+      | Winnie the Pooh |
+      | Roger Rabbit    |
       
   
 Scenario: Report results and generate new matchups

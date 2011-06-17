@@ -1,5 +1,10 @@
 Given /^I have started a tournament$/ do
   @tournament = Tournament.create
+
+  Tournament.destroy_all
+  Participation.destroy_all
+  Player.destroy_all
+  Match.destroy_all
 end
 
 Given /^I add the following players:$/ do |table|
@@ -18,15 +23,7 @@ Then /^"([^"]*)" should have a match against "([^"]*)"$/ do |player1_name, playe
   player1 = Player.where(:name => player1_name).first
   player2 = Player.where(:name => player2_name).first
 
-  matching_duel = nil
-  @tournament.current_matchups.each do |duel|
-    if duel.player1 == player1 and duel.player2 == player2 or
-        duel.player1 == player2 and duel.player2 == player1
-      matching_duel = duel 
-    end
-  end
-
-  @tournament.current_matchups.should include matching_duel
+  @tournament.current_matchups.should include_match_between_players [player1, player2]
 end
 
 Given /^I report the following results:$/ do |table|
@@ -35,16 +32,15 @@ Given /^I report the following results:$/ do |table|
     player2 = Player.where(:name => attributes['player 2']).first
 
     @tournament.report_result({ :player => player1, 
-                                :wins => attributes['player 1 wins'] },
+                                :wins => attributes['player 1 wins'].to_i },
                               { :player => player2,
-                                :wins => attributes['player 2 wins'] })
+                                :wins => attributes['player 2 wins'].to_i })
   end
 end
 
 Then /^the listings should be as follows:$/ do |table|
-  expected_listings = table.hashes.each do |attributes|
-    player = Player.where(:name => attributes['player']).first
-    { :player => player, :place => attributes['place'] }
+  expected_listings = table.hashes.collect do |attributes|
+    Player.where(:name => attributes['player']).first
   end
 
   @tournament.listings.should == expected_listings
