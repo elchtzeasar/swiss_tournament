@@ -38,11 +38,13 @@ module ActsAsTournament
     def report_result(player1_hash, player2_hash)
       player1 = player1_hash[:player]
       player2 = player2_hash[:player]
-      match = matches.find(:first,
-                        :conditions => [ 'player1_id=? and player2_id=? or ' +
-                                         'player1_id=? and player2_id=?',
-                                         player1, player2,
-                                         player2, player1 ])
+      match = matches.
+        find(:first,
+             :conditions => [ '(player1_id=? and player2_id=? or' +
+                              ' player1_id=? and player2_id=?) and ' +
+                              'player1_wins is null and player2_wins is null',
+                              player1, player2,
+                              player2, player1])
 
       raise "Cannot find match between #{player1.name} and #{player2.name} on report_result" if match.nil?
       match.update_attributes(:player1_wins => player1_hash[:wins], 

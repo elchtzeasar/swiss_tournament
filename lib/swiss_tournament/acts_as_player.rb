@@ -8,6 +8,9 @@ module ActsAsPlayer
     def acts_as_player(optons = {})
       send :include, InstanceMethods
 
+      has_many :participations
+      has_many :tournaments, :through => 'participations'
+
       validates_uniqueness_of :name
     end
   end

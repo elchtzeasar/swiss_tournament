@@ -1,10 +1,10 @@
 Given /^I have started a tournament$/ do
-  @tournament = Tournament.create
-
   Tournament.destroy_all
   Participation.destroy_all
   Player.destroy_all
   Match.destroy_all
+
+  @tournament = Tournament.create
 end
 
 Given /^I add the following players:$/ do |table|
@@ -15,8 +15,55 @@ Given /^I add the following players:$/ do |table|
   end
 end
 
+Given /^I have started a tournament with "([^"]*)" players$/ do |number_of_players|
+  Tournament.destroy_all
+  Participation.destroy_all
+  Player.destroy_all
+  Match.destroy_all
+
+  @tournament = Tournament.create
+
+  number_of_players.to_i.times do |number|
+    player = Player.create(:name => "Player #{number}")
+
+    @tournament.add_player(player)
+  end
+end
+
+Given /^the player with the fewest points always wins$/ do
+  @config ||= Hash.new
+
+  @config[:win_condition] = :fewest_points
+end
+
 Given /^I generate matchups$/ do
   @tournament.generate_matchups
+end
+
+Given /^the players play "([^"]*)" rounds$/ do |number_of_rounds|
+  number_of_rounds.to_i.times do |round_index|
+    @tournament.generate_matchups
+
+    case @config[:win_condition]
+      when :fewest_points
+        @tournament.current_matchups.each do |match|
+          participation1 = match.player1.participations.
+            find(:first, :conditions => { :tournament_id => @tournament })
+          participation2 = match.player2.participations.
+            find(:first, :conditions => { :tournament_id => @tournament })
+          
+            if participation1.points < participation2.points
+              @tournament.report_result({ :player => match.player1, :wins => 2 },
+                                        { :player => match.player2, :wins => 0 })
+            else
+              @tournament.report_result({ :player => match.player1, :wins => 0 },
+                                        { :player => match.player2, :wins => 2 })
+            end
+        end
+      else
+      raise "Unknown win condition: #{@config[:win_condition]}"
+    end
+  end
 end
 
 Then /^"([^"]*)" should have a match against "([^"]*)"$/ do |player1_name, player2_name|
@@ -44,4 +91,10 @@ Then /^the listings should be as follows:$/ do |table|
   end
 
   @tournament.listings.should == expected_listings
+end
+
+Then /^no players should have met more then once$/ do
+  matches = Match.all
+
+  matches.should have_unique_matchups
 end

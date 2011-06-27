@@ -6,7 +6,7 @@ ActiveRecord::Schema.define do
 
   create_table "players", :force => true do |t|
     t.column 'name', :string
-    t.column 'rating', :integer
+    t.column 'rating', :integer, :default => 1500
   end
 
   create_table "participations", :force => true do |t|

@@ -122,7 +122,8 @@ describe Tournament do
 
     it 'should add the reported results to the correct match' do
       @tournament.matches.stub!(:find).with(:first, :conditions =>
-        ['player1_id=? and player2_id=? or player1_id=? and player2_id=?',
+        ['(player1_id=? and player2_id=? or player1_id=? and player2_id=?) and ' +
+         'player1_wins is null and player2_wins is null',
          @players[0], @players[1], @players[1], @players[0]]).and_return(@match)
 
       @match.should_receive(:update_attributes).with(:player1_wins => 2,
