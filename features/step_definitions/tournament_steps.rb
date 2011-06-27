@@ -70,7 +70,7 @@ Then /^"([^"]*)" should have a match against "([^"]*)"$/ do |player1_name, playe
   player1 = Player.where(:name => player1_name).first
   player2 = Player.where(:name => player2_name).first
 
-  @tournament.current_matchups.should include_match_between_players [player1, player2]
+  @tournament.current_matchups.should include create_match(player1, player2)
 end
 
 Given /^I report the following results:$/ do |table|
@@ -97,4 +97,8 @@ Then /^no players should have met more then once$/ do
   matches = Match.all
 
   matches.should have_unique_matchups
+end
+
+def create_match(player1, player2)
+  Factory.build(:match, :player1_id => player1.id, :player2_id => player2.id, :tournament_id => @tournament.id)
 end

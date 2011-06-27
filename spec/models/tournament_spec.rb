@@ -47,8 +47,8 @@ describe Tournament do
 
       @tournament.current_matchups.size.should == @players.size / 2
 
-      @tournament.current_matchups.should include_match_between_players [@players[0], @players[1]]
-      @tournament.current_matchups.should include_match_between_players [@players[2], @players[3]]
+      @tournament.current_matchups.should include create_match(0, 1)
+      @tournament.current_matchups.should include create_match(2, 3)
     end
 
     it 'should not generate matchups if current matchups have not been reported yet' do
@@ -82,8 +82,8 @@ describe Tournament do
 
       @tournament.generate_matchups
 
-      @tournament.current_matchups.should include_match_between_players [@players[1], @players[3]]
-      @tournament.current_matchups.should include_match_between_players [@players[0], @players[2]]
+      @tournament.current_matchups.should include create_match(1, 3)
+      @tournament.current_matchups.should include create_match(0, 2)
     end
 
     it 'should use players tie break if several players have the same points' do
@@ -101,8 +101,8 @@ describe Tournament do
 
       @tournament.generate_matchups
 
-      @tournament.current_matchups.should include_match_between_players [@players[0], @players[3]]
-      @tournament.current_matchups.should include_match_between_players [@players[1], @players[2]]
+      @tournament.current_matchups.should include create_match(0, 3)
+      @tournament.current_matchups.should include create_match(1, 2)
     end
   end
 
@@ -177,5 +177,15 @@ describe Tournament do
 
       @tournament.listings.should == @players.values_at(2, 0, 1, 3)
     end
+  end
+
+  def create_match(player1_index, player2_index)
+    player1 = @players[player1_index]
+    player2 = @players[player2_index]
+
+    Factory.build(:match,
+                  :player1_id => player1.id,
+                  :player2_id => player2.id,
+                  :tournament_id => @tournament.id)
   end
 end
