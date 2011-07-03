@@ -14,18 +14,14 @@ ActiveRecord::Base.establish_connection({
 require 'factories'
 require 'schema'
 
-RSpec::Matchers.define :include_match_between_players do |players|
-  match do |container|
+RSpec::Matchers.define :include_tournament_round_with do |matches|
+  match do |tournament_rounds|
     diffable
     
     included = false
-    container.each do |potential_match_match|
-      if ( potential_match_match.player1_id == players[0].id and
-           potential_match_match.player2_id == players[1].id ) or
-         ( potential_match_match.player1_id == players[1].id and
-           potential_match_match.player2_id == players[0].id )
-        included = true
-      end
+    tournament_rounds.each do |tournament_round|
+      #included = true if tournament_round.matches.sort == matches.sort
+      included = true if tournament_round.matches == matches
     end
 
     included

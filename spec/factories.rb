@@ -2,6 +2,7 @@
 require 'factory_girl'
 
 Factory.define :tournament do |swiss|
+  swiss.id 1
   swiss.created_at Time.mktime(2000)
   swiss.updated_at Time.mktime(2001)
   swiss.rounds_played 0

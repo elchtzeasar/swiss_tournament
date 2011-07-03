@@ -1,3 +1,6 @@
+require 'tournament_round'
+require 'tournament_round_creator'
+
 module ActsAsTournament
   def self.included(base)
     base.send :extend, ClassMethods
@@ -23,9 +26,13 @@ module ActsAsTournament
     def generate_matchups
       raise "Cannot generate new matchups since #{current_matchups.size} matchups have not been reported!" if current_matchups.size > 0
 
-      listings.each_slice(2) do |players|
-        matches.create(:player1 => players[0],
-                       :player2 => players[1])
+      if rounds_played == 0
+        return listings.each_slice(2) do |players|
+          matches.create(:player1 => players[0],
+                         :player2 => players[1])
+        end
+      else
+        return TournamentRoundCreator.new.generate_round(self, players, matches.to_a)
       end
     end
 

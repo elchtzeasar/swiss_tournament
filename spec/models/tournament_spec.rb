@@ -59,58 +59,20 @@ describe Tournament do
       @tournament.current_matchups.size.should == @players.size / 2
     end
 
-    it 'should generate matchups once the current matchups have been reported' do
-      @tournament.stub!(:rounds_played).and_return(1)
-
-      @tournament.participations[0].stub!(:points).and_return(1)
-      @tournament.participations[1].stub!(:points).and_return(6)
-      @tournament.participations[2].stub!(:points).and_return(3)
-      @tournament.participations[3].stub!(:points).and_return(5)
+    it 'should generate matchups through TournamentRoundCreator on non-initial matchup' do
+      @tournament.stub!(:rounds_played).and_return(2)
+      TournamentRoundCreator.any_instance.should_receive(:generate_round).
+        with(@tournament, @players, [])
 
       @tournament.generate_matchups
-
-      @tournament.current_matchups.size.should == @players.size / 2
-    end
-
-    it 'should generate matchups the second time between players with similar points' do
-      @tournament.stub!(:rounds_played).and_return(1)
-
-      @tournament.participations[0].stub!(:points).and_return(1)
-      @tournament.participations[1].stub!(:points).and_return(6)
-      @tournament.participations[2].stub!(:points).and_return(3)
-      @tournament.participations[3].stub!(:points).and_return(5)
-
-      @tournament.generate_matchups
-
-      @tournament.current_matchups.should include create_match(1, 3)
-      @tournament.current_matchups.should include create_match(0, 2)
-    end
-
-    it 'should use players tie break if several players have the same points' do
-      @tournament.stub!(:rounds_played).and_return(1)
-
-      @tournament.participations[0].stub!(:points).and_return(3)
-      @tournament.participations[1].stub!(:points).and_return(3)
-      @tournament.participations[2].stub!(:points).and_return(3)
-      @tournament.participations[3].stub!(:points).and_return(3)
-
-      @tournament.participations[0].stub!(:tie_break).and_return(+3)
-      @tournament.participations[1].stub!(:tie_break).and_return(0)
-      @tournament.participations[2].stub!(:tie_break).and_return(0)
-      @tournament.participations[3].stub!(:tie_break).and_return(+2)
-
-      @tournament.generate_matchups
-
-      @tournament.current_matchups.should include create_match(0, 3)
-      @tournament.current_matchups.should include create_match(1, 2)
     end
   end
 
   describe 'report_result' do
     before(:each) do
-      @tournament.generate_matchups
+      #@tournament.generate_matchups
 
-      @match = mock(Match)
+      @match = stub(Match, :update_attributes => nil)
       @tournament.stub!(:current_matchups).and_return([@match])
 
       @players.each_index do |index|
@@ -118,14 +80,19 @@ describe Tournament do
           ['player_id=?', @players[index]]).
           and_return(@participations[index])
       end
-    end
 
-    it 'should add the reported results to the correct match' do
       @tournament.matches.stub!(:find).with(:first, :conditions =>
         ['(player1_id=? and player2_id=? or player1_id=? and player2_id=?) and ' +
          'player1_wins is null and player2_wins is null',
          @players[0], @players[1], @players[1], @players[0]]).and_return(@match)
+      @tournament.matches.stub!(:find).with(:first, :conditions =>
+        ['(player1_id=? and player2_id=? or player1_id=? and player2_id=?) and ' +
+         'player1_wins is null and player2_wins is null',
+         @players[2], @players[3], @players[3], @players[2]]).and_return(@match)
+    end
 
+    it 'should add the reported results to the correct match' do
+     
       @match.should_receive(:update_attributes).with(:player1_wins => 2,
                                                     :player2_wins => 1)
 
