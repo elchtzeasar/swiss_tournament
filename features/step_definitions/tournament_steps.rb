@@ -30,38 +30,85 @@ Given /^I have started a tournament with "([^"]*)" players$/ do |number_of_playe
   end
 end
 
+Given /^the player with the most points always wins$/ do
+  @config ||= Hash.new
+
+  @config[:win_condition] = :most_points
+end
+
 Given /^the player with the fewest points always wins$/ do
   @config ||= Hash.new
 
   @config[:win_condition] = :fewest_points
 end
 
+Given /^the players always draw$/ do
+  @config ||= Hash.new
+
+  @config[:win_condition] = :always_draw
+end
+
 Given /^I generate matchups$/ do
   @tournament.generate_matchups
 end
 
-Given /^the players play "([^"]*)" rounds$/ do |number_of_rounds|
+Given /^the players play "([^"]*)" rounds?$/ do |number_of_rounds|
   number_of_rounds.to_i.times do |round_index|
     @tournament.generate_matchups
 
-    case @config[:win_condition]
+    winner = :noone
+
+    @tournament.current_matchups.each do |match|
+      participation1 = match.player1.participations.
+        find(:first, :conditions => { :tournament_id => @tournament })
+      participation2 = match.player2.participations.
+        find(:first, :conditions => { :tournament_id => @tournament })
+
+      case @config[:win_condition]
+      when :always_draw
+        winner = :draw
       when :fewest_points
-        @tournament.current_matchups.each do |match|
-          participation1 = match.player1.participations.
-            find(:first, :conditions => { :tournament_id => @tournament })
-          participation2 = match.player2.participations.
-            find(:first, :conditions => { :tournament_id => @tournament })
-          
-            if participation1.points < participation2.points
-              @tournament.report_result({ :player => match.player1, :wins => 2 },
-                                        { :player => match.player2, :wins => 0 })
-            else
-              @tournament.report_result({ :player => match.player1, :wins => 0 },
-                                        { :player => match.player2, :wins => 2 })
-            end
+        if participation1.points == 0 and participation2.points == 0
+          if match.player1.rating < match.player2.rating
+            winner = :player1
+          else
+            winner = :player2
+          end
+        elsif participation1.points < participation2.points
+          winner = :player1
+        else
+          winner = :player2
         end
+      when :most_points
+        if participation1.points == 0 and participation2.points == 0
+          if match.player1.rating > match.player2.rating
+            winner = :player1
+          else
+            winner = :player2
+          end
+        elsif participation1.points > participation2.points
+          winner = :player1
+        else
+          winner = :player2
+        end
+        
       else
-      raise "Unknown win condition: #{@config[:win_condition]}"
+        raise "Unknown win condition: #{@config[:win_condition]}"
+      end
+
+      case winner
+      when :player1
+        @tournament.report_result({ :player => match.player1, :wins => 2 },
+                                  { :player => match.player2, :wins => 0 })
+      when :player2
+        @tournament.report_result({ :player => match.player1, :wins => 0 },
+                                  { :player => match.player2, :wins => 2 })
+      when :draw
+        @tournament.report_result({ :player => match.player1, :wins => 1 },
+                                  { :player => match.player2, :wins => 1 })
+      else
+        raise "winner not set for win condition #{@config[:win_condition]}"
+      end
     end
   end
 end
