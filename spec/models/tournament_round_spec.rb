@@ -21,18 +21,18 @@ describe TournamentRound do
     end
   end
 
-  #describe 'rating_difference' do
-  #  it 'should return the sum of all the rating differences of matches' do
-  #    matches = [ create_match(1,2), create_match(3,4) ]
-  #    
-  #    matches.first.stub!(:rating_difference).and_return(4)
-  #    matches.last.stub!(:rating_difference).and_return(2)
-  #    
-  #    tournament_round = TournamentRound.new(@tournament, matches)
-  #
-  #    tournament_round.rating_difference.should == 6
-  #  end
-  #end
+  describe 'rating_difference' do
+    it 'should return the sum of all the rating differences of matches' do
+      matches = [ create_match(1,2), create_match(3,4) ]
+      
+      matches.first.stub!(:rating_difference).and_return(4)
+      matches.last.stub!(:rating_difference).and_return(2)
+      
+      tournament_round = TournamentRound.new(@tournament, matches)
+  
+      tournament_round.rating_difference.should == 6
+    end
+  end
 
   describe 'create_rounds' do
     players = Factory.build(:player), Factory.build(:player), Factory.build(:player), Factory.build(:player)

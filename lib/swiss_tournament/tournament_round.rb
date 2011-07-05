@@ -10,6 +10,10 @@ class TournamentRound
     eval(@matches.collect { |m| m.point_difference }.join('+'))
   end
 
+  def rating_difference
+    eval(@matches.collect { |m| m.rating_difference }.join('+'))
+  end
+
   def self.create_rounds(tournament, players, played_matches)
     rounds = Array.new
 

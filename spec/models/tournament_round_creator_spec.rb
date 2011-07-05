@@ -17,14 +17,28 @@ describe TournamentRoundCreator do
       @tournament_round_creator.generate_round(@tournament, @players, @played_games)
     end
 
-    it 'should return the round with the smallest points' do
+    it 'should return the round with the rating difference if rounds have not been played' do
+      @tournament.stub!(:rounds_played).and_return(0)
+      rating_differences = [3,1,5]
       rounds = (0..2).to_a.collect do |index|
-        stub_round(:point_difference => index)
+        stub_round(:rating_difference => rating_differences[index])
       end
       TournamentRound.stub!(:create_rounds).and_return(rounds)
 
       @tournament_round_creator.generate_round(
-        @tournament, @players, @played_games).should == rounds[0]
+        @tournament, @players, @played_games).should == rounds[1]
+    end
+
+    it 'should return the round with the smallest point difference if rounds have been played' do
+      @tournament.stub!(:rounds_played).and_return(3)
+      point_differences = [3, 1, 5]
+      rounds = (0..2).to_a.collect do |index|
+        stub_round(:point_difference => point_differences[index])
+      end
+      TournamentRound.stub!(:create_rounds).and_return(rounds)
+
+      @tournament_round_creator.generate_round(
+        @tournament, @players, @played_games).should == rounds[1]
     end
 
     it 'should save all matches in the chosen round' do

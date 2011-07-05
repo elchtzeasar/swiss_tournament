@@ -42,15 +42,6 @@ describe Tournament do
     before(:each) do
     end
 
-    it 'should generate matchups according to rating on initial matchup' do
-      @tournament.generate_matchups
-
-      @tournament.current_matchups.size.should == @players.size / 2
-
-      @tournament.current_matchups.should include create_match(0, 1)
-      @tournament.current_matchups.should include create_match(2, 3)
-    end
-
     it 'should not generate matchups if current matchups have not been reported yet' do
       @tournament.generate_matchups
 
@@ -59,8 +50,7 @@ describe Tournament do
       @tournament.current_matchups.size.should == @players.size / 2
     end
 
-    it 'should generate matchups through TournamentRoundCreator on non-initial matchup' do
-      @tournament.stub!(:rounds_played).and_return(2)
+    it 'should generate matchups through TournamentRoundCreator' do
       TournamentRoundCreator.any_instance.should_receive(:generate_round).
         with(@tournament, @players, [])
 

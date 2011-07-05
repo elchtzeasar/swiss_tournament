@@ -26,14 +26,8 @@ module ActsAsTournament
     def generate_matchups
       raise "Cannot generate new matchups since #{current_matchups.size} matchups have not been reported!" if current_matchups.size > 0
 
-      if rounds_played == 0
-        return listings.each_slice(2) do |players|
-          matches.create(:player1 => players[0],
-                         :player2 => players[1])
-        end
-      else
-        return TournamentRoundCreator.new.generate_round(self, players, matches.to_a)
-      end
+      return TournamentRoundCreator.new.
+        generate_round(self, players, matches.to_a)
     end
 
     def current_matchups
