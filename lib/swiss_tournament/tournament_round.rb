@@ -26,13 +26,19 @@ class TournamentRound
       matches = []
 
       permutation.each_slice(2) do |player1, player2|
-        matches << [player1, player2].sort { |p1, p2| p1.id <=> p2.id }
+        matches << [player1, player2].sort do |p1, p2|
+          if p2.nil?
+            -1 # Make sure the player is first if match is a bye
+          else
+            p1.id <=> p2.id
+          end
+        end
       end
       rounds << matches.sort { |m1, m2| m1.first.id <=> m2.first.id }
     end
     rounds.uniq!
 
-    # Delete rounds that contain matches that have allready been played:
+    # Delete rounds that contain matches that have already been played:
     rounds = rounds.delete_if do |matches|
       allready_played_match_found = false
 
@@ -52,7 +58,7 @@ class TournamentRound
       matches.collect! do |match|
         Match.new(:tournament_id => tournament.id,
                   :player1_id => match[0].id,
-                  :player2_id => match[1].id)
+                  :player2_id => if match[1].nil? then nil else match[1].id end)
       end
 
       TournamentRound.new(tournament, matches)

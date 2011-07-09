@@ -60,9 +60,10 @@ describe Tournament do
 
   describe 'report_result' do
     before(:each) do
-      #@tournament.generate_matchups
-
-      @match = stub(Match, :update_attributes => nil)
+      @match = stub(Match,
+                    :update_attributes => nil,
+                    :report_result => nil,
+                    :player1_id => @players[0].id)
       @tournament.stub!(:current_matchups).and_return([@match])
 
       @players.each_index do |index|
@@ -81,10 +82,10 @@ describe Tournament do
          @players[2], @players[3], @players[3], @players[2]]).and_return(@match)
     end
 
-    it 'should add the reported results to the correct match' do
-     
-      @match.should_receive(:update_attributes).with(:player1_wins => 2,
-                                                    :player2_wins => 1)
+    it 'should report result in match' do
+      @tournament.stub!(:current_matchups).and_return([])
+      @tournament.stub!(:rounds_played).and_return(1)
+      @match.should_receive(:report_result).with(2, 1)
 
       @tournament.report_result({ :player => @players[0], :wins => 2 },
                                 { :player => @players[1], :wins => 1 })
@@ -94,20 +95,6 @@ describe Tournament do
       @tournament.stub!(:current_matchups).and_return([])
       @tournament.stub!(:rounds_played).and_return(1)
       @tournament.should_receive(:rounds_played=).with(2)
-
-      @tournament.report_result({ :player => @players[2], :wins => 2 },
-                                { :player => @players[3], :wins => 1 })
-    end
-
-    it 'should update participations for player 1' do
-      @participations[0].should_receive(:report_result).with(2, 1)
-
-      @tournament.report_result({ :player => @players[0], :wins => 2 },
-                                { :player => @players[1], :wins => 1 })
-    end
-
-    it 'should update participations for player 2' do
-      @participations[1].should_receive(:report_result).with(1, 2)
 
       @tournament.report_result({ :player => @players[0], :wins => 2 },
                                 { :player => @players[1], :wins => 1 })

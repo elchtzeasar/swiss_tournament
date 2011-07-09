@@ -15,7 +15,7 @@ Given /^I add the following players:$/ do |table|
   end
 end
 
-Given /^I have started a tournament with "([^"]*)" players$/ do |number_of_players|
+Given /^I have started a tournament with (\d+) players$/ do |number_of_players|
   Tournament.destroy_all
   Participation.destroy_all
   Player.destroy_all
@@ -52,13 +52,14 @@ Given /^I generate matchups$/ do
   @tournament.generate_matchups
 end
 
-Given /^the players play "([^"]*)" rounds?$/ do |number_of_rounds|
+Given /^the players play (\d+) rounds?$/ do |number_of_rounds|
   number_of_rounds.to_i.times do |round_index|
     @tournament.generate_matchups
 
     winner = :noone
 
     @tournament.current_matchups.each do |match|
+      next if match.bye? # Dont report result for bied matches
       participation1 = match.player1.participations.
         find(:first, :conditions => { :tournament_id => @tournament })
       participation2 = match.player2.participations.
@@ -111,6 +112,22 @@ Given /^the players play "([^"]*)" rounds?$/ do |number_of_rounds|
       end
     end
   end
+end
+
+Then /^there should be (\d+) matchups$/ do |number_of_matchups|
+  @tournament.current_matchups.find { |match| not match.player2_id.nil? }
+end
+
+Then /^there should be (\d+) bye$/ do |number_of_draws|
+  @tournament.current_matchups.find { |match| match.player2_id.nil? }
+end
+
+Then /^no player should have byed more then once$/ do
+  player_ids_with_byes = Match.where(:player2_id => nil).collect do |match|
+    match.player1_id
+  end
+
+  player_ids_with_byes.should == player_ids_with_byes.uniq
 end
 
 Then /^"([^"]*)" should have a match against "([^"]*)"$/ do |player1_name, player2_name|

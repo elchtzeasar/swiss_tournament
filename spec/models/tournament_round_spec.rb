@@ -51,7 +51,6 @@ describe TournamentRound do
       end
     end
 
-
     it 'should create all rounds possible when given a list of 6 players' do
       tournament_rounds =
         TournamentRound.create_rounds(@tournament, create_players(6), [])
@@ -69,9 +68,9 @@ describe TournamentRound do
 
     it 'should not generate rounds with matches between players that have allready met' do
       played_matches = [ create_match(1,2), create_match(2,3) ]
-      tournament_rounds =
-        TournamentRound.create_rounds(@tournament, create_players(4),
-                                      played_matches)
+      tournament_rounds = TournamentRound.create_rounds(@tournament,
+                                                        create_players(4),
+                                                        played_matches)
 
       impossible_matches = [
         [ create_match(1,2), create_match(3,4) ],
@@ -79,6 +78,34 @@ describe TournamentRound do
       ]
       for matches in impossible_matches do
         tournament_rounds.should_not include_tournament_round_with matches
+      end
+    end
+
+    it 'should create a bye match if there are an odd number of players' do
+      played_matches = []
+      tournament_rounds = TournamentRound.create_rounds(@tournament,
+                                                        create_players(5),
+                                                        played_matches)
+
+      for tournament_round in tournament_rounds do
+        bye_match = tournament_round.matches.find { |match| match.bye? }
+        bye_match.should be_a Match
+        bye_match.should be_bye
+      end
+    end
+
+    it 'should not create a bye match for a player that has already byed' do
+      players = create_players(5)
+      byed_player = players.first
+      played_matches = [ create_match(byed_player.id, nil) ]
+
+      tournament_rounds = TournamentRound.create_rounds(@tournament,
+                                                        players,
+                                                        played_matches)
+
+      for tournament_round in tournament_rounds do
+        bye_match = tournament_round.matches.find { |match| match.bye? and match.player1 == byed_player  }
+        bye_match.should be_nil
       end
     end
   end

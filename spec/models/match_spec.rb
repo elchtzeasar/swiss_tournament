@@ -25,19 +25,39 @@ describe Match do
     it 'should return the difference in points between the players' do
       player1 = player_with_id(1)
       player2 = player_with_id(2)
-      participation1 = mock(Participation, :points => 5)
-      participation2 = mock(Participation, :points => 2)
 
-      Participation.stub!(:find).
-        with(:first, :conditions => {
-               :player_id => 1,
-               :tournament_id => @tournament_id }).and_return(participation1)
-      Participation.stub!(:find).
-        with(:first, :conditions => {
-               :player_id => 2,
-               :tournament_id => @tournament_id }).and_return(participation2)
+      participation1 = stub_participation(1, :points => 5)
+      participation2 = stub_participation(2, :points => 2)
 
       match_between_players(player1, player2).point_difference.should == 3
+    end
+  end
+
+  describe 'report_result' do
+    before(:each) do
+      @participation1 = stub_participation(1, :points => 5, :report_result => nil)
+      @participation2 = stub_participation(2, :points => 2, :report_result => nil)
+
+      @match = match_between_players(1,2)
+    end
+
+    it 'should add the reported results to the correct match' do
+      @match.should_receive(:update_attributes).with(:player1_wins => 2,
+                                                     :player2_wins => 1)
+
+      @match.report_result(2, 1)
+    end
+
+    it 'should update participations for player 1' do
+      @participation1.should_receive(:report_result).with(2, 1)
+
+      @match.report_result(2, 1)
+    end
+
+    it 'should update participations for player 2' do
+      @participation2.should_receive(:report_result).with(1, 2)
+
+      @match.report_result(2, 1)
     end
   end
 
@@ -122,5 +142,16 @@ describe Match do
     Match.new(:tournament_id => @tournament_id,
               :player1_id => player1.id,
               :player2_id => player2.id)
+  end
+
+  def stub_participation(player_id, stubs = {})
+    participation = mock(Participation, stubs)
+
+    Participation.stub!(:find).
+      with(:first, :conditions => {
+             :player_id => player_id,
+             :tournament_id => @tournament_id }).and_return(participation)
+
+    return participation
   end
 end

@@ -48,16 +48,11 @@ module ActsAsTournament
                               player2, player1])
 
       raise "Cannot find match between #{player1.name} and #{player2.name} on report_result" if match.nil?
-      match.update_attributes(:player1_wins => player1_hash[:wins], 
-                              :player2_wins => player2_hash[:wins])
-
-      participation1 = participations.find(:first,
-        :conditions => ['player_id=?', player1])
-      participation2 = participations.find(:first,
-        :conditions => ['player_id=?', player2])
-
-      participation1.report_result(player1_hash[:wins], player2_hash[:wins])
-      participation2.report_result(player2_hash[:wins], player1_hash[:wins])
+      if match.player1_id == player1.id
+        match.report_result(player1_hash[:wins], player2_hash[:wins])
+      else
+        match.report_result(player2_hash[:wins], player1_hash[:wins])
+      end
 
       if current_matchups.size == 0
         update_attribute(:rounds_played, rounds_played + 1)
