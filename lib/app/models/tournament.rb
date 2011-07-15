@@ -1,6 +1,3 @@
-require 'tournament_round'
-require 'tournament_round_creator'
-
 class Tournament < ActiveRecord::Base
   has_many :participations
   has_many :players, :through => :participations
