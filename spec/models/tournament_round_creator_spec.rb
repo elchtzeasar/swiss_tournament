@@ -1,7 +1,5 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
-require 'tournament_round_creator'
-
 describe TournamentRoundCreator do
   before(:each) do
     @tournament_round_creator = TournamentRoundCreator.new

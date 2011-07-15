@@ -1,4 +1,6 @@
-require 'swiss_tournament/acts_as_match'
-require 'swiss_tournament/acts_as_participation'
-require 'swiss_tournament/acts_as_player'
-require 'swiss_tournament/acts_as_tournament'
+require 'active_record'
+
+require 'app/models/match'
+require 'app/models/participation'
+require 'app/models/player'
+require 'app/models/tournament'

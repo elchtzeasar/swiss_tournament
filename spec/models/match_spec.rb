@@ -1,7 +1,5 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
-require 'match'
-
 describe Match do
   before(:each) do
     @tournament_id = 1

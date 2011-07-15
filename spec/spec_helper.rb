@@ -3,8 +3,9 @@ $LOAD_PATH.push File.dirname(__FILE__) + '/../lib'
 $LOAD_PATH.push File.dirname(__FILE__) + '/../lib/swiss_tournament'
 $LOAD_PATH.push File.dirname(__FILE__) + '/include'
 
+require 'swiss_tournament'
+
 require 'rubygems'
-require 'active_record'
 
 ActiveRecord::Base.establish_connection({
   :adapter => 'sqlite3',

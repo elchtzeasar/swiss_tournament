@@ -1,8 +1,5 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
-require 'player'
-require 'tournament_round'
-
 describe TournamentRound do
   before(:each) do
     @tournament = Factory.build(:tournament)
