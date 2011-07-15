@@ -1,13 +1,11 @@
-Given /^I have started a tournament$/ do
+Given /^I have started a tournament with the following players:$/ do |table|
   Tournament.destroy_all
   Participation.destroy_all
   Player.destroy_all
   Match.destroy_all
 
   @tournament = Tournament.create
-end
 
-Given /^I add the following players:$/ do |table|
   table.hashes.each do |attributes|
     player = Player.create(attributes)
 

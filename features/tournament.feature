@@ -3,8 +3,7 @@ In order to be able to run swiss tournaments
   We need to be able to add players, generate matchups, report results and see listings
 
 Scenario: Generate initial matchups
-  Given I have started a tournament
-    And I add the following players:
+  Given I have started a tournament with the following players:
       | name            | rating |
       | Bugs Bunny      |   1500 |
       | Roger Rabbit    |   1501 |
@@ -15,8 +14,7 @@ Scenario: Generate initial matchups
     And "Speedrunner" should have a match against "Winnie the Pooh"
 
 Scenario: Report results and see listings
-  Given I have started a tournament
-    And I add the following players:
+  Given I have started a tournament with the following players:
       | name            | rating |
       | Bugs Bunny      |   1503 |
       | Roger Rabbit    |   1502 |
@@ -33,8 +31,7 @@ Scenario: Report results and see listings
       
   
 Scenario: Report results and generate new matchups
-  Given I have started a tournament
-    And I add the following players:
+  Given I have started a tournament with the following players:
       | name            | rating |
       | Bugs Bunny      |    1500 |
       | Roger Rabbit    |    1501 |
@@ -47,8 +44,7 @@ Scenario: Report results and generate new matchups
     And "Roger Rabbit" should have a match against "Winnie the Pooh"
 
 Scenario: Matchup with number of players
-  Given I have started a tournament
-    And I add the following players:
+  Given I have started a tournament with the following players:
       | name            | rating |
       | Bugs Bunny      |    1500 |
       | Roger Rabbit    |    1501 |
@@ -60,8 +56,7 @@ Scenario: Matchup with number of players
     And there should be 1 bye
 
 Scenario: No more then 1 bye per player
-  Given I have started a tournament
-    And I add the following players:
+  Given I have started a tournament with the following players:
       | name            |  rating |
       | Bugs Bunny      |    1500 |
       | Roger Rabbit    |    1501 |
